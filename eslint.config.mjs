@@ -25,6 +25,7 @@ const eslintConfig = [
       '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
       semi: ['error', 'always'],
       quotes: ['error', 'single'],
+      'react/no-unescaped-entities': 'off',
     },
   },
   {
