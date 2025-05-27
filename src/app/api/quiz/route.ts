@@ -1,24 +1,46 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
+  const { theme } = await req.json();
+
+  const prompt = `Génère une question de quiz avec 4 options sur le thème suivant : "${theme}". Indique la bonne réponse clairement. Réponds au format JSON en respectant ce typage : type Question = { question: string; options: string[]; answer: string;};`;
+
+  const response = await fetch('http://localhost:11434/api/generate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'mistral',
+      prompt,
+    }),
+  });
+
+  const reader = response.body?.getReader();
+  const decoder = new TextDecoder();
+  let done = false;
+  let fullText = '';
+
+  while (!done) {
+    const { value, done: doneReading } = await reader!.read();
+    done = doneReading;
+    const chunk = decoder.decode(value);
+
+    for (const line of chunk.split('\n')) {
+      try {
+        if (line.trim() === '') continue;
+        const parsed = JSON.parse(line);
+        fullText += parsed.response || '';
+      } catch (err) {
+        console.warn('Ligne invalide ignorée :', line);
+      }
+    }
+  }
+  const jsonBlock = fullText.match(/{[\s\S]*}/)?.[0] || '{}';
+
   try {
-    const { theme } = await req.json();
-
-    const questions = [
-      {
-        question: `Which of these is a character from ${theme}?`,
-        options: ['Yoda', 'Spiderman', 'Harry Potter', 'Shrek'],
-        answer: 'Yoda',
-      },
-      {
-        question: `When was the first ${theme} movie released?`,
-        options: ['1977', '1980', '1999', '2005'],
-        answer: '1977',
-      },
-    ];
-
-    return NextResponse.json({ questions }, { status: 200 });
-  } catch (error) {
-    return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
+    const question = JSON.parse(jsonBlock);
+    return NextResponse.json({ question });
+  } catch (e) {
+    console.error('Erreur de parsing Mistral:', e);
+    return NextResponse.json({ question: null });
   }
 }
