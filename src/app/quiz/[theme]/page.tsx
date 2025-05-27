@@ -31,6 +31,7 @@ export default function QuizPageWithTheme() {
 
         const data = await res.json();
         setQuestion(data.question || []);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (err) {
         setError(true);
       } finally {

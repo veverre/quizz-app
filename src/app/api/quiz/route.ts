@@ -30,6 +30,7 @@ export async function POST(req: NextRequest) {
         if (line.trim() === '') continue;
         const parsed = JSON.parse(line);
         fullText += parsed.response || '';
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (err) {
         console.warn('Ligne invalide ignorée :', line);
       }
