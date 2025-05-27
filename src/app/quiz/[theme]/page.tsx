@@ -11,13 +11,13 @@ type Question = {
 
 export default function QuizPageWithTheme() {
   const { theme } = useParams<{ theme: string }>();
-  const [questions, setQuestions] = useState<Question[]>([]);
+  const [question, setQuestion] = useState<Question>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchQuestions = async () => {
+    const fetchQuestion = async () => {
       try {
         const res = await fetch('/api/quiz', {
           method: 'POST',
@@ -30,7 +30,8 @@ export default function QuizPageWithTheme() {
         if (!res.ok) throw new Error('Failed to fetch');
 
         const data = await res.json();
-        setQuestions(data.questions || []);
+        setQuestion(data.question || []);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (err) {
         setError(true);
       } finally {
@@ -38,7 +39,7 @@ export default function QuizPageWithTheme() {
       }
     };
 
-    fetchQuestions();
+    fetchQuestion();
   }, [theme]);
 
   const handleVerifyResponse = (e: React.FormEvent) => {
@@ -57,25 +58,23 @@ export default function QuizPageWithTheme() {
     <main className="flex flex-col items-center justify-center min-h-screen p-4">
       <h1 className="text-2xl font-bold mb-4">Quiz on "{decodeURIComponent(theme)}"</h1>
       <p className="mb-4">This is a quiz page for the theme: {decodeURIComponent(theme)}</p>
-      {questions && questions.length > 0 ? (
-        questions.map((question, index) => (
-          <form onSubmit={handleVerifyResponse} className="p-4" key={index}>
-            <QuizQuestion
-              question={question.question}
-              options={question.options}
-              selectedOption={selectedOption}
-              onOptionSelect={option => setSelectedOption(option)}
-            />
-            <button
-              type="submit"
-              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            >
-              Submit Answer
-            </button>
-          </form>
-        ))
+      {question ? (
+        <form onSubmit={handleVerifyResponse} className="p-4">
+          <QuizQuestion
+            question={question.question}
+            options={question.options}
+            selectedOption={selectedOption}
+            onOptionSelect={option => setSelectedOption(option)}
+          />
+          <button
+            type="submit"
+            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            Submit Answer
+          </button>
+        </form>
       ) : (
-        <p className="text-gray-500">No questions available for this theme.</p>
+        <p>No question available for this theme.</p>
       )}
     </main>
   );

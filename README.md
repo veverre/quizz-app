@@ -34,3 +34,24 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## 🤖 Lancer l'IA en local
+
+Ce projet utilise [Ollama](https://ollama.com/) pour exécuter un modèle de langage en local (`mistral`). Suivez les étapes ci-dessous pour installer et faire tourner l'IA :
+
+### 1. Installer Ollama
+
+Téléchargez et installez Ollama depuis le site officiel :  
+👉 [https://ollama.com/download](https://ollama.com/download)
+
+### 2. Démarrer le serveur Ollama
+
+Une fois installé, Ollama fonctionne automatiquement en tâche de fond sur `http://localhost:11434`.
+
+### 3. Télécharger et exécuter le modèle Mistral
+
+Dans un terminal, lancez la commande suivante pour télécharger et démarrer le modèle :
+
+```bash
+ollama run mistral
+```
