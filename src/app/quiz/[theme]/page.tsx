@@ -11,7 +11,7 @@ type Question = {
 
 export default function QuizPageWithTheme() {
   const { theme } = useParams<{ theme: string }>();
-  const [question, setQuestion] = useState<Question[]>([]);
+  const [question, setQuestion] = useState<Question>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -58,20 +58,24 @@ export default function QuizPageWithTheme() {
     <main className="flex flex-col items-center justify-center min-h-screen p-4">
       <h1 className="text-2xl font-bold mb-4">Quiz on "{decodeURIComponent(theme)}"</h1>
       <p className="mb-4">This is a quiz page for the theme: {decodeURIComponent(theme)}</p>
-      <form onSubmit={handleVerifyResponse} className="p-4">
-        <QuizQuestion
-          question={question.question}
-          options={question.options}
-          selectedOption={selectedOption}
-          onOptionSelect={option => setSelectedOption(option)}
-        />
-        <button
-          type="submit"
-          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-        >
-          Submit Answer
-        </button>
-      </form>
+      {question ? (
+        <form onSubmit={handleVerifyResponse} className="p-4">
+          <QuizQuestion
+            question={question.question}
+            options={question.options}
+            selectedOption={selectedOption}
+            onOptionSelect={option => setSelectedOption(option)}
+          />
+          <button
+            type="submit"
+            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            Submit Answer
+          </button>
+        </form>
+      ) : (
+        <p>No question available for this theme.</p>
+      )}
     </main>
   );
 }
