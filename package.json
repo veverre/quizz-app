@@ -7,9 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "prepare": "husky"
   },
   "dependencies": {
+    "husky": "^9.1.7",
     "next": "15.3.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
