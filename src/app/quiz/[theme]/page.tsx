@@ -1,27 +1,82 @@
 'use client';
 import { useParams } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { QuizQuestion } from '@/components/organisms';
+
+type Question = {
+  question: string;
+  options: string[];
+  answer: string;
+};
 
 export default function QuizPageWithTheme() {
   const { theme } = useParams<{ theme: string }>();
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      try {
+        const res = await fetch('/api/quiz', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ theme }),
+        });
+
+        if (!res.ok) throw new Error('Failed to fetch');
+
+        const data = await res.json();
+        setQuestions(data.questions || []);
+      } catch (err) {
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchQuestions();
+  }, [theme]);
+
+  const handleVerifyResponse = (e: React.FormEvent) => {
+    e.preventDefault();
+    alert(`You selected: ${selectedOption}`);
+    // TODO: Implement response verification logic
+  };
 
   if (!theme) {
     return <div className="p-4">No theme provided.</div>;
   }
+  if (loading) return <p>Loading quiz...</p>;
+  if (error) return <p>Failed to load questions.</p>;
 
   return (
     <main className="flex flex-col items-center justify-center min-h-screen p-4">
       <h1 className="text-2xl font-bold mb-4">Quiz on "{decodeURIComponent(theme)}"</h1>
       <p className="mb-4">This is a quiz page for the theme: {decodeURIComponent(theme)}</p>
-
-      <QuizQuestion
-        question="What is the capital of France?"
-        options={['Paris', 'London', 'Berlin', 'Madrid']}
-        selectedOption={selectedOption}
-        onOptionSelect={option => setSelectedOption(option)}
-      />
+      {questions && questions.length > 0 ? (
+        questions.map((question, index) => (
+          <form onSubmit={handleVerifyResponse} className="p-4" key={index}>
+            <QuizQuestion
+              question={question.question}
+              options={question.options}
+              selectedOption={selectedOption}
+              onOptionSelect={option => setSelectedOption(option)}
+            />
+            <button
+              type="submit"
+              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
+              Submit Answer
+            </button>
+          </form>
+        ))
+      ) : (
+        <p className="text-gray-500">No questions available for this theme.</p>
+      )}
     </main>
   );
 }
