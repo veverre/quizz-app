@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
+import Link from 'next/link';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -24,7 +25,23 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>{children}</body>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <nav className="bg-gray-800 text-white p-4">
+          <div className="container mx-auto">
+            <h1 className="text-2xl font-bold">
+              <Link href="/" className="text-white hover:text-gray-300">
+                Quiz App
+              </Link>
+            </h1>
+          </div>
+        </nav>
+        <div className="container mx-auto p-4">{children}</div>
+        <footer className="bg-gray-800 text-white p-4 mt-8">
+          <div className="container mx-auto text-center">
+            <p>&copy; {new Date().getFullYear()} Quiz App. All rights reserved.</p>
+          </div>
+        </footer>
+      </body>
     </html>
   );
 }

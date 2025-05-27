@@ -15,7 +15,7 @@ export default function Home() {
       <p>This is a simple Next.js quiz application using AI.</p>
       <form onSubmit={handleSubmit} className="flex flex-col space-y-4 w-full max-w-md">
         <label>
-          Feel free to enter a quiz theme :
+          Feel free to enter a quiz theme :
           <input
             name="quiz-theme"
             value={theme}
