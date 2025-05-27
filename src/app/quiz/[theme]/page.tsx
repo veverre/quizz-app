@@ -3,7 +3,7 @@ import { useParams } from 'next/navigation';
 import { useState } from 'react';
 import { QuizQuestion } from '@/components/organisms';
 
-export default function QuizPage() {
+export default function QuizPageWithTheme() {
   const { theme } = useParams<{ theme: string }>();
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
