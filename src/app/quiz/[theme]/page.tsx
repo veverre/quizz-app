@@ -52,7 +52,7 @@ export default function QuizPageWithTheme() {
   }
   if (loading) return <p>Loading quiz...</p>;
   if (error) return <p>Failed to load questions.</p>;
-  console.log('Question:', question);
+
   return (
     <main className="flex flex-col items-center justify-center min-h-screen p-4">
       <h1 className="text-2xl font-bold mb-4">Quiz on "{decodeURIComponent(theme)}"</h1>
