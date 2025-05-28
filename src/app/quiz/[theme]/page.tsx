@@ -1,6 +1,6 @@
 'use client';
 import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { QuizQuestion } from '@/components/organisms';
 
 type Question = {
@@ -16,36 +16,47 @@ export default function QuizPageWithTheme() {
   const [error, setError] = useState(false);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchQuestion = async () => {
-      try {
-        const res = await fetch('/api/quiz', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ theme }),
-        });
+  const fetchQuestion = useCallback(async () => {
+    setLoading(true);
+    setError(false);
+    setSelectedOption(null);
+    try {
+      const res = await fetch('/api/quiz', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ theme }),
+      });
 
-        if (!res.ok) throw new Error('Failed to fetch');
+      if (!res.ok) throw new Error('Failed to fetch');
 
-        const data = await res.json();
-        setQuestion(data.question || []);
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      } catch (err) {
-        setError(true);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchQuestion();
+      const data = await res.json();
+      setQuestion(data.question || []);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (err) {
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
   }, [theme]);
 
-  const handleVerifyResponse = (e: React.FormEvent) => {
+  useEffect(() => {
+    fetchQuestion();
+  }, [fetchQuestion]);
+
+  const handleVerifyResponse = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert(`You selected: ${selectedOption}`);
-    // TODO: Implement response verification logic
+    if (!selectedOption) {
+      alert('Please select an option before submitting.');
+      return;
+    }
+    if (selectedOption === question?.answer) {
+      alert('Correct answer!');
+      await fetchQuestion();
+    } else {
+      alert(`Incorrect answer!`);
+    }
   };
 
   if (!theme) {
@@ -59,7 +70,7 @@ export default function QuizPageWithTheme() {
       <h1 className="text-2xl font-bold mb-4">Quiz on "{decodeURIComponent(theme)}"</h1>
       <p className="mb-4">This is a quiz page for the theme: {decodeURIComponent(theme)}</p>
       {question ? (
-        <form onSubmit={handleVerifyResponse} className="p-4">
+        <form onSubmit={handleVerifyResponse} className="flex flex-col p-4">
           <QuizQuestion
             question={question.question}
             options={question.options}
